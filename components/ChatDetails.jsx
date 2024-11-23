@@ -1,23 +1,23 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useRef } from "react";
-import Loader from "./Loader";
-import { AddPhotoAlternate } from "@mui/icons-material";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { CldUploadButton } from "next-cloudinary";
-import MessageBox from "./MessageBox";
-import { pusherClient } from "@lib/pusher";
+import { useState, useEffect, useRef } from "react"
+import Loader from "./Loader"
+import { AddPhotoAlternate } from "@mui/icons-material"
+import { useSession } from "next-auth/react"
+import Link from "next/link"
+import { CldUploadButton } from "next-cloudinary"
+import MessageBox from "./MessageBox"
+import { pusherClient } from "@lib/pusher"
 
 const ChatDetails = ({ chatId }) => {
-  const [loading, setLoading] = useState(true);
-  const [chat, setChat] = useState({});
-  const [otherMembers, setOtherMembers] = useState([]);
+  const [loading, setLoading] = useState(true)
+  const [chat, setChat] = useState({})
+  const [otherMembers, setOtherMembers] = useState([])
 
-  const { data: session } = useSession();
-  const currentUser = session?.user;
+  const { data: session } = useSession()
+  const currentUser = session?.user
 
-  const [text, setText] = useState("");
+  const [text, setText] = useState("")
 
   const getChatDetails = async () => {
     try {
@@ -26,21 +26,19 @@ const ChatDetails = ({ chatId }) => {
         headers: {
           "Content-Type": "application/json",
         },
-      });
-      const data = await res.json();
-      setChat(data);
-      setOtherMembers(
-        data?.members?.filter((member) => member._id !== currentUser._id)
-      );
-      setLoading(false);
+      })
+      const data = await res.json()
+      setChat(data)
+      setOtherMembers(data?.members?.filter((member) => member._id !== currentUser._id))
+      setLoading(false)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   useEffect(() => {
-    if (currentUser && chatId) getChatDetails();
-  }, [currentUser, chatId]);
+    if (currentUser && chatId) getChatDetails()
+  }, [currentUser, chatId])
 
   const sendText = async () => {
     try {
@@ -54,15 +52,15 @@ const ChatDetails = ({ chatId }) => {
           currentUserId: currentUser._id,
           text,
         }),
-      });
+      })
 
       if (res.ok) {
-        setText("");
+        setText("")
       }
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const sendPhoto = async (result) => {
     try {
@@ -76,41 +74,41 @@ const ChatDetails = ({ chatId }) => {
           currentUserId: currentUser._id,
           photo: result?.info?.secure_url,
         }),
-      });
+      })
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   useEffect(() => {
-    pusherClient.subscribe(chatId);
+    pusherClient.subscribe(chatId)
 
     const handleMessage = async (newMessage) => {
       setChat((prevChat) => {
         return {
           ...prevChat,
           messages: [...prevChat.messages, newMessage],
-        };
-      });
-    };
+        }
+      })
+    }
 
-    pusherClient.bind("new-message", handleMessage);
+    pusherClient.bind("new-message", handleMessage)
 
     return () => {
-      pusherClient.unsubscribe(chatId);
-      pusherClient.unbind("new-message", handleMessage);
-    };
-  }, [chatId]);
+      pusherClient.unsubscribe(chatId)
+      pusherClient.unbind("new-message", handleMessage)
+    }
+  }, [chatId])
 
   /* Scrolling down to the bottom when having the new message */
 
-  const bottomRef = useRef(null);
+  const bottomRef = useRef(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
-    });
-  }, [chat?.messages]);
+    })
+  }, [chat?.messages])
 
   return loading ? (
     <Loader />
@@ -121,27 +119,18 @@ const ChatDetails = ({ chatId }) => {
           {chat?.isGroup ? (
             <>
               <Link href={`/chats/${chatId}/group-info`}>
-                <img
-                  src={chat?.groupPhoto || "/assets/group.png"}
-                  alt="group-photo"
-                  className="profilePhoto"
-                />
+                <img src={chat?.groupPhoto || "/assets/group.png"} alt="group-photo" className="profilePhoto" />
               </Link>
 
               <div className="text">
                 <p>
-                  {chat?.name} &#160; &#183; &#160; {chat?.members?.length}{" "}
-                  members
+                  {chat?.name} &#160; &#183; &#160; {chat?.members?.length} members
                 </p>
               </div>
             </>
           ) : (
             <>
-              <img
-                src={otherMembers[0].profileImage || "/assets/person.jpg"}
-                alt="profile photo"
-                className="profilePhoto"
-              />
+              <img src={otherMembers[0].profileImage || "/assets/person.jpg"} alt="profile photo" className="profilePhoto" />
               <div className="text">
                 <p>{otherMembers[0].username}</p>
               </div>
@@ -151,22 +140,14 @@ const ChatDetails = ({ chatId }) => {
 
         <div className="chat-body">
           {chat?.messages?.map((message, index) => (
-            <MessageBox
-              key={index}
-              message={message}
-              currentUser={currentUser}
-            />
+            <MessageBox key={index} message={message} currentUser={currentUser} />
           ))}
           <div ref={bottomRef} />
         </div>
 
         <div className="send-message">
           <div className="prepare-message">
-            <CldUploadButton
-              options={{ maxFiles: 1 }}
-              onUpload={sendPhoto}
-              uploadPreset="upecg01j"
-            >
+            <CldUploadButton options={{ maxFiles: 1 }} onUpload={sendPhoto} uploadPreset="qnanoqg2">
               <AddPhotoAlternate
                 sx={{
                   fontSize: "35px",
@@ -183,6 +164,12 @@ const ChatDetails = ({ chatId }) => {
               className="input-field"
               value={text}
               onChange={(e) => setText(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault()
+                  sendText()
+                }
+              }}
               required
             />
           </div>
@@ -193,7 +180,7 @@ const ChatDetails = ({ chatId }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ChatDetails;
+export default ChatDetails

@@ -71,8 +71,8 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
       <div>
         <p className="text-base-light text-grey-3">
           {!lastMessage
-            ? format(new Date(chat?.createdAt), "p")
-            : format(new Date(chat?.lastMessageAt), "p")}
+            ? format(new Date(chat?.createdAt), "dd MMM yyyy, HH:mm")
+            : format(new Date(chat?.lastMessageAt), "dd MMM yyyy, HH:mm")}
         </p>
       </div>
     </div>
