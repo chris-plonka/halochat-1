@@ -63,7 +63,7 @@
 
 /* Bottom Bar */
 .bottom-bar {
-  @apply fixed bottom-0 z-50 w-full flex justify-between items-center px-5 py-2 bg-white sm:hidden
+  @apply fixed bottom-0 z-50 w-full flex justify-between items-center px-5 py-2 bg-white sm:hidden;
 }
 
 /* Profile Page */
@@ -72,7 +72,7 @@
 }
 
 .edit-profile {
-  @apply flex flex-col gap-9
+  @apply flex flex-col gap-9;
 }
 
 .profile {
@@ -135,7 +135,7 @@
 }
 
 .input-group-name {
-  @apply bg-white rounded-2xl px-5 py-3 outline-none ;
+  @apply bg-white rounded-2xl px-5 py-3 outline-none;
 }
 
 .selected-contact {
@@ -144,7 +144,7 @@
 
 /* ChatDetails */
 .chat-details {
-  @apply h-screen flex flex-col bg-white rounded-2xl;
+  @apply h-lvh flex flex-col bg-white rounded-2xl;
 }
 
 /* Chat Header */
